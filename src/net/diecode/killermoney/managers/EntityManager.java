@@ -93,12 +93,22 @@ public class EntityManager implements Listener {
                     CCommandHandler.process(wp.getCCommandProperties(),victim, killerP);
                 }
 
-                // Cash transfer
+                // Cash transfer or Lose Cash
                 if (wp instanceof PlayerWorldProperties) {
                     PlayerWorldProperties pwp = (PlayerWorldProperties)wp;
+                    System.out.print("KM.Debug #0 - PlayerWorldProperties found.");
 
                     if (pwp.getCashTransferProperties() != null && pwp.getCashTransferProperties().isEnabled()) {
                         CashTransferHandler.process(pwp.getCashTransferProperties(), damagers, killerP, victimP);
+                        System.out.print("KM.Debug #1 - fml it sends to cashtransfer instead");
+                    }
+                } else if (wp instanceof PlayerWorldSecondaryProperties) {
+                    PlayerWorldSecondaryProperties pwp = (PlayerWorldSecondaryProperties)wp;
+                    System.out.print("KM.Debug #0 - PlayerWorldSecondaryProperties found.");
+
+                    if (pwp.getLoseCashProperties() != null && pwp.getLoseCashProperties().isEnabled()) {
+                        System.out.print("KM.Debug #1");
+                        LoseCashHandler.process(pwp.getLoseCashProperties(), victimP);
                     }
                 }
             }

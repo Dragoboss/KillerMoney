@@ -560,6 +560,41 @@ PLAYER:
             Percent: 5%
             Max-amount: 5000
             Chance: 100%
+        Lose-cash:
+            Enabled: false
+            Method: "Amount"   # Can be "Percent" (also activates Max-amount) or "Amount"
+            Percent: 3%        # only if method = "Percent"
+            Max-amount: 2000   # only if method = "Percent"
+            Amount: 50 ? 500   # only if method = "Amount"
+            Chance: 100%
+            Causes:            # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/event/entity/EntityDamageEvent.DamageCause.html
+            - BLOCK_EXPLOSION
+            - CONTACT
+            - CRAMMING            
+            - CUSTOM            
+            - DRAGON_BREATH            
+            - DROWNING            
+            - ENTITY_ATTACK            
+            - ENTITY_EXPLOSION
+            - ENTITY_SWEEP_ATTACK
+            - FALL
+            - FALLING_BLOCK
+            - FIRE
+            - FIRE_TICK
+            - FLY_INTO_WALL
+            - HOT_FLOOR
+            - LAVA
+            - LIGHTNING
+            - MAGIC
+            - MELTING
+            - POISON
+            - PROJECTILE
+            - STARVATION
+            - SUFFOCATION
+            - SUICIDE
+            - THORNS
+            - VOID
+            - WITHER
 POLAR_BEAR:
     '*':
         Money:

@@ -3,7 +3,8 @@ package net.diecode.killermoney.enums;
 public enum KMPermission {
 
     ADMIN("admin"),
-    MONEY_MULTIPLIER("money.multiplier"),
+    MONEY_MULTIPLIER("money.multiplier"),     
+    MONEY_DISCOUNTER("money.discounter"),
 
     LIMIT_MONEY_MULTIPLIER("moneylimit.multiplier"),
     //LIMIT_ITEM_MULTIPLIER("itemlimit.multiplier"),

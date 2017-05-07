@@ -35,6 +35,7 @@ public class DefaultConfig extends ConfigManager {
 
     private static HashMap<String, Double> moneyMultipliers = new HashMap<>();
     private static HashMap<String, Double> limitMultipliers = new HashMap<>();
+    private static HashMap<String, Double> moneyDiscounters = new HashMap<>();
 
     public DefaultConfig(String fileName) {
         super(fileName);
@@ -136,6 +137,18 @@ public class DefaultConfig extends ConfigManager {
                 Logger.warning("Invalid limit multiplier value at: " + s);
             }
         }
+        
+        // Get the Discounters section from config
+        perms = getConfig().getConfigurationSection("Configurable-permissions.Money-discounters").getKeys(false);
+        for (String s : perms) {
+            try {
+                double value = getConfig().getDouble("Configurable-permissions.Money-discounters." + s);
+                
+                moneyDiscounters.put(s, value);
+            } catch (Exception e) {
+                Logger.warning("Invalid money discounter value at: " + s);
+            }
+        }
 
         hookMineChart = getConfig().getBoolean("Hook.MineChart.Enabled");
 
@@ -216,5 +229,9 @@ public class DefaultConfig extends ConfigManager {
 
     public static HashMap<String, Double> getLimitMultipliers() {
         return limitMultipliers;
+    }
+    
+    public static HashMap<String, Double> getMoneyDiscounters() {
+        return moneyDiscounters;
     }
 }

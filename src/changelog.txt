@@ -1,3 +1,11 @@
+4.0.3
+---
+- Unofficial edit until approved by diecode
+- Adds 'Lose Money' section on Player entity
+  - Can lose amount or percentage on death
+  - Damage cause can be defined
+  - As always, permission node / chance can be defined
+
 4.0.2
 ---
 - (Fixed) Update checker

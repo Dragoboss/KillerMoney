@@ -106,6 +106,7 @@ public class BukkitMain extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new AntiFarmingHandler(), this);
         Bukkit.getPluginManager().registerEvents(new LimitHandler(), this);
         Bukkit.getPluginManager().registerEvents(new MultiplierHandler(), this);
+        Bukkit.getPluginManager().registerEvents(new LoseCashHandler(), this);
         Bukkit.getPluginManager().registerEvents(updater, this);
 
         if (DefaultConfig.isCheckUpdate()) {

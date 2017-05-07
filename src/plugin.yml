@@ -1,6 +1,6 @@
 name: KillerMoney
 main: net.diecode.killermoney.BukkitMain
-version: 4.0.2
+version: 4.0.3
 softdepend: [Vault, MobArena, MineChart, Multiverse-Core]
 author: diecode
 website: http://dev.bukkit.org/bukkit-plugins/killermoney/

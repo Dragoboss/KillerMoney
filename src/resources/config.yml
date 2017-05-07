@@ -26,6 +26,9 @@ Configurable-permissions:
         donator: 1.5
         vip: 2
         elite: 2.5
+    Money-discounters:
+        starter: 50
+        advanced: 20
 Hook:
     MobArena:
         Enabled: false

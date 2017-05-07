@@ -12,7 +12,8 @@ public enum LanguageString {
     GENERAL_LIMIT_REACHED("&aLimit reached. &7Limit will be reset after {0}"), // {0} = reset time
     GENERAL_YOU_KILLED_A_PLAYER("&7You killed a player (&a{0}&7). You earned &a${1}&7. Your damage was: &a{2}"), // {0} = victim name, {1} = money, {2} = damage
     GENERAL_YOU_KILLED_BY_PLAYER("&7You killed by players (&a{0}&7). You lost &a${1}&7."), // {0} = killers' name, {1} = money
-
+    GENERAL_YOU_DIED("&7You were killed... You lost &a${0}&7."), //{0} = money
+    
     // Multiplier
     MULTIPLIER_SET_NEW_MULTIPLIER_VALUE("&7You set multiplier to &a{0}x&7. Time left: &a{1}"), // {0} = multiplier value, {1} = time
     MULTIPLIER_GET_CURRENT_MULTIPLIER("&7Current multiplier value is &a{0}x&7. Time left: &a{1}"), // {0} = multiplier value, {1} = time

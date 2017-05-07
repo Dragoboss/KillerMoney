@@ -12,6 +12,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 public class EntitiesConfig extends ConfigManager {
@@ -67,6 +69,7 @@ public class EntitiesConfig extends ConfigManager {
                 CCommandProperties cCommandProperties = null;
                 CItemProperties cItemProperties = null;
                 CashTransferProperties cashTransferProperties = null;
+                LoseCashProperties loseCashProperties = null;
 
                 // World value
                 if (world.equalsIgnoreCase("*")) {
@@ -369,7 +372,7 @@ public class EntitiesConfig extends ConfigManager {
                 // Set up cash transfer
                 if (entityType == EntityType.PLAYER) {
                     boolean enabled = true;
-                    double percent;
+                    double percent = 100;
                     int maxAmount = 0;
                     double chance = 100;
                     String permission = null;
@@ -432,19 +435,120 @@ public class EntitiesConfig extends ConfigManager {
                             }
                         }
                     }
+                    
+                    boolean enabledLose = true;
+                    String method = "AMOUNT";
+                    double minMoney = 0;
+                    double maxMoney = 0;
+                    List<String> dmgCauses = new ArrayList<>(Arrays.asList("BLOCK_EXPLOSION", "CONTACT", "CRAMMING", 
+                            "CUSTOM", "DRAGON_BREATH", "DROWNING", "ENTITY_ATTACK", "ENTITY_EXPLOSION", 
+                            "ENTITY_SWEEP_ATTACK", "FALL", "FALLING_BLOCK", "FIRE", "FIRE_TICK", "FLY_INTO_WALL", 
+                            "HOT_FLOOR", "LAVA", "LIGHTNING", "MAGIC", "MELTING", "POISON", "PROJECTILE", 
+                            "STARVATION", "SUFFOCATION", "SUICIDE", "THORNS", "VOID", "WITHER"));
+
+                    // Enabled value
+                    if (getConfig().isSet(entity + "." + world + ".Lose-cash.Enabled")) {
+                        if (!(getConfig().getBoolean(entity + "." + world + ".Cash-transfer.Enabled"))) {
+                            enabledLose = getConfig().getBoolean(entity + "." + world + ".Lose-cash.Enabled");
+                            System.out.print("Lose Cash enabled");
+                        } else {
+                            Logger.warning("Both 'Cash-transfer' and 'Lose-cash' are on. Disabling 'Lose-cash'....");
+                        }
+                    }
+
+                    if (enabledLose) {
+                        System.out.print("LoseCash Config - enabledLose = true");
+                        if (!getConfig().isSet(entity + "." + world + ".Lose-cash.Method")) {
+                            Logger.warning("Missing method in lose cash section. Lose cash disabled.");
+                        } else {
+                            if (getConfig().isSet(entity + "." + world + ".Lose-cash.Chance")) {
+                                chance = Utils.cleanChanceString(getConfig().getString(entity + "."
+                                        + world + ".Lose-cash.Chance"));
+                            }
+                            
+                            // Get the damage causes at which to lose money on death
+                            if (getConfig().isSet(entity + "." + world + ".Lose-cash.Causes")) {
+                                dmgCauses = getConfig().getStringList(entity + "."
+                                        + world + ".Cash-transfer.Chance");
+                            }
+
+                            // Permission value
+                            if (getConfig().isSet(entity + "." + world + ".Lose-cash.Permission")) {
+                                permission = getConfig().getString(entity + "." + world + ".Cash-transfer.Permission");
+                            }
+                            
+                            method = getConfig().getString(entity + "." + world + ".Lose-cash.Method").toUpperCase();
+                            if (method.equals("AMOUNT")) {
+                                System.out.print("LoseCash Config - Method = AMOUNT");
+                                if (!getConfig().isSet(entity + "." + world + ".Lose-cash.Amount")) {
+                                    Logger.warning("Missing amount in lose cash section. Lose cash disabled.");
+                                } else {
+                                    String moneyValue = getConfig().getString(entity + "." + world + ".Lose-cash.Amount")
+                                            .replaceAll("\\s", "");
+
+                                    if (moneyValue.contains("?")) {
+                                        String[] splittedValue = moneyValue.split("\\?");
+
+                                        minMoney = Double.valueOf(splittedValue[0]);
+                                        maxMoney = Double.valueOf(splittedValue[1]);
+                                    } else {
+                                        minMoney = Double.valueOf(moneyValue);
+                                        maxMoney = Double.valueOf(moneyValue);
+                                    }
+                                    System.out.print("LoseCash Config - Properties sending");
+
+                                    loseCashProperties = new LoseCashProperties(method, percent, maxAmount, minMoney, maxMoney,
+                                            chance, permission, dmgCauses, enabledLose);
+                                }
+                            } else if (method.equals("PERCENT")) {
+                                System.out.print("LoseCash Config - Method = PERCENT");
+                                if (!getConfig().isSet(entity + "." + world + ".Lose-cash.Percent")) {
+                                    Logger.warning("Missing amount in lose cash section. Lose cash disabled.");
+                                } else {
+                                    percent = Utils.cleanChanceString(getConfig().getString(entity + "."
+                                        + world + ".Lose-cash.Percent"));
+
+                                    if (percent < 0) {
+                                        percent = 0;
+                                    } else if (percent > 100) {
+                                        percent = 100;
+                                    }
+
+                                    if (getConfig().isSet(entity + "." + world + ".Lose-cash.Max-amount")) {
+                                        maxAmount = getConfig().getInt(entity + "." + world + ".Lose-cash.Max-amount");
+                                    }
+
+                                    if (percent > 0) {
+                                        System.out.print("LoseCash Config - Properties sent");
+                                        loseCashProperties = new LoseCashProperties(method, percent, maxAmount, minMoney, maxMoney,
+                                            chance, permission, dmgCauses, enabledLose);
+                                    }
+                                }
+                            } else {
+                                Logger.warning("Found incorrect method in lose cash section. Lose cash disabled.");
+                            }                            
+                        }
+                    }
                 }
 
-                WorldProperties worldProperties;
+                WorldProperties worldProperties = null;
 
                 if (entityType != EntityType.PLAYER) {
                     worldProperties = new WorldProperties(worlds, moneyProperties,
                             cCommandProperties, cItemProperties);
                 } else {
-                    worldProperties = new PlayerWorldProperties(worlds, moneyProperties, cCommandProperties,
-                            cItemProperties, cashTransferProperties);
+                    if (cashTransferProperties.isEnabled()) {
+                        worldProperties = new PlayerWorldProperties(worlds, moneyProperties, cCommandProperties,
+                                cItemProperties, cashTransferProperties);
+                    } else if (loseCashProperties.isEnabled()) {
+                        worldProperties = new PlayerWorldSecondaryProperties(worlds, moneyProperties, cCommandProperties,
+                                cItemProperties, loseCashProperties);
+                    }
                 }
 
-                entityProperties.getWorldProperties().add(worldProperties);
+                if (worldProperties != null) {
+                    entityProperties.getWorldProperties().add(worldProperties);
+                }
             }
 
             EntityManager.getEntityProperties().put(entityType, entityProperties);
