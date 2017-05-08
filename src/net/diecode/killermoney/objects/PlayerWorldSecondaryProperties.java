@@ -10,7 +10,6 @@ public class PlayerWorldSecondaryProperties extends WorldProperties {
                            CCommandProperties cCommandProperties, CItemProperties cItemProperties,
                                  LoseCashProperties loseCashProperties) {
         super(worlds, moneyProperties, cCommandProperties, cItemProperties);
-
         this.loseCashProperties = loseCashProperties;
     }
 

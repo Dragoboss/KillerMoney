@@ -450,14 +450,12 @@ public class EntitiesConfig extends ConfigManager {
                     if (getConfig().isSet(entity + "." + world + ".Lose-cash.Enabled")) {
                         if (!(getConfig().getBoolean(entity + "." + world + ".Cash-transfer.Enabled"))) {
                             enabledLose = getConfig().getBoolean(entity + "." + world + ".Lose-cash.Enabled");
-                            System.out.print("Lose Cash enabled");
                         } else {
                             Logger.warning("Both 'Cash-transfer' and 'Lose-cash' are on. Disabling 'Lose-cash'....");
                         }
                     }
 
                     if (enabledLose) {
-                        System.out.print("LoseCash Config - enabledLose = true");
                         if (!getConfig().isSet(entity + "." + world + ".Lose-cash.Method")) {
                             Logger.warning("Missing method in lose cash section. Lose cash disabled.");
                         } else {
@@ -474,12 +472,11 @@ public class EntitiesConfig extends ConfigManager {
 
                             // Permission value
                             if (getConfig().isSet(entity + "." + world + ".Lose-cash.Permission")) {
-                                permission = getConfig().getString(entity + "." + world + ".Cash-transfer.Permission");
+                                permission = getConfig().getString(entity + "." + world + ".Lose-cash.Permission");
                             }
                             
                             method = getConfig().getString(entity + "." + world + ".Lose-cash.Method").toUpperCase();
                             if (method.equals("AMOUNT")) {
-                                System.out.print("LoseCash Config - Method = AMOUNT");
                                 if (!getConfig().isSet(entity + "." + world + ".Lose-cash.Amount")) {
                                     Logger.warning("Missing amount in lose cash section. Lose cash disabled.");
                                 } else {
@@ -495,13 +492,10 @@ public class EntitiesConfig extends ConfigManager {
                                         minMoney = Double.valueOf(moneyValue);
                                         maxMoney = Double.valueOf(moneyValue);
                                     }
-                                    System.out.print("LoseCash Config - Properties sending");
-
                                     loseCashProperties = new LoseCashProperties(method, percent, maxAmount, minMoney, maxMoney,
                                             chance, permission, dmgCauses, enabledLose);
                                 }
                             } else if (method.equals("PERCENT")) {
-                                System.out.print("LoseCash Config - Method = PERCENT");
                                 if (!getConfig().isSet(entity + "." + world + ".Lose-cash.Percent")) {
                                     Logger.warning("Missing amount in lose cash section. Lose cash disabled.");
                                 } else {
@@ -519,7 +513,6 @@ public class EntitiesConfig extends ConfigManager {
                                     }
 
                                     if (percent > 0) {
-                                        System.out.print("LoseCash Config - Properties sent");
                                         loseCashProperties = new LoseCashProperties(method, percent, maxAmount, minMoney, maxMoney,
                                             chance, permission, dmgCauses, enabledLose);
                                     }
@@ -537,10 +530,10 @@ public class EntitiesConfig extends ConfigManager {
                     worldProperties = new WorldProperties(worlds, moneyProperties,
                             cCommandProperties, cItemProperties);
                 } else {
-                    if (cashTransferProperties.isEnabled()) {
+                    if (cashTransferProperties != null && cashTransferProperties.isEnabled()) {
                         worldProperties = new PlayerWorldProperties(worlds, moneyProperties, cCommandProperties,
                                 cItemProperties, cashTransferProperties);
-                    } else if (loseCashProperties.isEnabled()) {
+                    } else if (loseCashProperties != null && loseCashProperties.isEnabled()) {
                         worldProperties = new PlayerWorldSecondaryProperties(worlds, moneyProperties, cCommandProperties,
                                 cItemProperties, loseCashProperties);
                     }

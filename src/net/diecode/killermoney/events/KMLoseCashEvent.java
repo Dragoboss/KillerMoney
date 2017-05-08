@@ -16,12 +16,13 @@ public class KMLoseCashEvent extends Event implements Cancellable {
     private Player victim;
     private BigDecimal amount;
     private boolean cancelled;
+    private double discount;
 
-    public KMLoseCashEvent(LoseCashProperties loseCashProperties, BigDecimal amount, Player victim) {
-        System.out.print("KM.Debug #5 - KMLoseCashEvent");
+    public KMLoseCashEvent(LoseCashProperties loseCashProperties, BigDecimal amount, Player victim, double discount) {
         this.loseCashProperties = loseCashProperties;
         this.amount = amount;
         this.victim = victim;
+        this.discount = discount;
     }
 
     public HandlerList getHandlers() {
@@ -42,6 +43,9 @@ public class KMLoseCashEvent extends Event implements Cancellable {
 
     public Player getVictim() {
         return victim;
+    }
+    public double getDiscount() {
+        return discount;
     }
 
     @Override

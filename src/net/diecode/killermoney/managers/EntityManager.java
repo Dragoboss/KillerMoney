@@ -15,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
+import net.diecode.killermoney.configs.EntitiesConfig;
 
 public class EntityManager implements Listener {
 
@@ -42,75 +43,84 @@ public class EntityManager implements Listener {
             return;
         }
 
-        // The killer is not a player
-        if (killerP == null) {
-            return;
-        }
+        // The killer is not a player ~~ Remove check due to LoseCash
+        //if (killerP == null) {
+          //     return;=
+       // }
 
         // Check player gamemode
-        if (!DefaultConfig.getAllowedGameModes().contains(killerP.getGameMode())) {
-            return;
+        if (killerP != null) {
+            if (!DefaultConfig.getAllowedGameModes().contains(killerP.getGameMode())) {
+                return;
+            }
         }
-
+        
         if (victimType == EntityType.PLAYER) {
             victimP = (Player)victim;
 
-            if (killerP.equals(victimP)) {
-                return;
+            if (killerP != null && killerP.equals(victimP)) {
+                    return;             
             }
         }
 
         // MobArena support
         if ((BukkitMain.getMobArenaHandler() != null) && DefaultConfig.isDisableRewardsInArena()) {
-            if (BukkitMain.getMobArenaHandler().isPlayerInArena(killerP)) {
+            if (killerP != null && BukkitMain.getMobArenaHandler().isPlayerInArena(killerP)) {
+                return;
+            }
+            if (BukkitMain.getMobArenaHandler().isPlayerInArena(victimP)) {
                 return;
             }
         }
 
         for (WorldProperties wp : ep.getWorldProperties()) {
+            boolean pwsp = false;
+            if (wp instanceof PlayerWorldSecondaryProperties) {
+                pwsp = true;
+            }
             if (wp.getWorlds().contains("*") || wp.getWorlds().contains(world.getName())) {
                 ArrayList<EntityDamage> damagers = entityDamages.get(victim.getUniqueId());
+                if (!pwsp) {
+                    if (killerP == null) {
+                        return;
+                    }
+                    // Money reward
+                    if (wp.getMoneyProperties() != null && wp.getMoneyProperties().isEnabled()) {
 
-                // Money reward
-                if (wp.getMoneyProperties() != null && wp.getMoneyProperties().isEnabled()) {
-
-                    MoneyHandler.process(wp.getMoneyProperties(), damagers, victim, killerP);
-                }
-
-                // Custom item drop reward
-                if (wp.getCItemProperties() != null && wp.getCItemProperties().isEnabled()) {
-
-                    if (!wp.getCItemProperties().isKeepDefaultItems()) {
-                        e.getDrops().clear();
+                        MoneyHandler.process(wp.getMoneyProperties(), damagers, victim, killerP);
                     }
 
-                    CItemHandler.process(wp.getCItemProperties(), victim, killerP, victim.getLocation());
-                }
+                    // Custom item drop reward
+                    if (wp.getCItemProperties() != null && wp.getCItemProperties().isEnabled()) {
 
-                // Custom command execution reward
-                if (wp.getCCommandProperties() != null && wp.getCCommandProperties().isEnabled()) {
+                        if (!wp.getCItemProperties().isKeepDefaultItems()) {
+                            e.getDrops().clear();
+                        }
 
-                    CCommandHandler.process(wp.getCCommandProperties(),victim, killerP);
-                }
-
-                // Cash transfer or Lose Cash
-                if (wp instanceof PlayerWorldProperties) {
-                    PlayerWorldProperties pwp = (PlayerWorldProperties)wp;
-                    System.out.print("KM.Debug #0 - PlayerWorldProperties found.");
-
-                    if (pwp.getCashTransferProperties() != null && pwp.getCashTransferProperties().isEnabled()) {
-                        CashTransferHandler.process(pwp.getCashTransferProperties(), damagers, killerP, victimP);
-                        System.out.print("KM.Debug #1 - fml it sends to cashtransfer instead");
+                        CItemHandler.process(wp.getCItemProperties(), victim, killerP, victim.getLocation());
                     }
-                } else if (wp instanceof PlayerWorldSecondaryProperties) {
+
+                    // Custom command execution reward
+                    if (wp.getCCommandProperties() != null && wp.getCCommandProperties().isEnabled()) {
+
+                        CCommandHandler.process(wp.getCCommandProperties(),victim, killerP);
+                    }
+                } else {
                     PlayerWorldSecondaryProperties pwp = (PlayerWorldSecondaryProperties)wp;
-                    System.out.print("KM.Debug #0 - PlayerWorldSecondaryProperties found.");
 
                     if (pwp.getLoseCashProperties() != null && pwp.getLoseCashProperties().isEnabled()) {
-                        System.out.print("KM.Debug #1");
                         LoseCashHandler.process(pwp.getLoseCashProperties(), victimP);
                     }
                 }
+                pwsp = false;
+                // Cash transfer
+                if (wp instanceof PlayerWorldProperties) {
+                    PlayerWorldProperties pwp = (PlayerWorldProperties)wp;
+
+                    if (pwp.getCashTransferProperties() != null && pwp.getCashTransferProperties().isEnabled()) {
+                        CashTransferHandler.process(pwp.getCashTransferProperties(), damagers, killerP, victimP);
+                    }
+                }                
             }
         }
 
